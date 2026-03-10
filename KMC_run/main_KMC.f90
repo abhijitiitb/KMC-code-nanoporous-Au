@@ -1,0 +1,152 @@
+PROGRAM MAIN
+!user is free to modify this code
+
+   USE VARIABLE_TYPE
+   USE Species
+   USE Crystal
+   USE io
+   USE utilities
+   USE PotentialPackage
+   USE NeighborList
+   USE OptimizationAL
+   USE OptimizationNEB
+   USE MDPackage
+   USE DimerMethod
+   USE NEB_package
+   USE KMC_VARIABLE_TYPE
+   USE KMCInitialize
+   USE KMCAlgorithm
+   USE KMCUtilities
+   USE metropolis
+   USE amd_db_manipulate
+   USE AMDProcess
+   USE KMCProcessSearchParallel
+   USE ANNModule
+   USE LatticeKMCModule
+   USE StillingerWeberGenerate
+   USE EAMGenerateModule
+   USE InteratomicPotentialsAssess
+   USE CEModel_Lattice
+   USE KMC_BinarySearch
+   USE mpimanager
+   USE mpi
+!  USE mdmpi_domaindecomposition
+   USE alignnanoparticle
+
+   IMPLICIT NONE
+
+   REAL(dp) :: Temperature1,prefac,xi,pnu_E,phi_E,e0,coreradius=20.0_dp,center(3)=(/104.065290,105.00565,104.51570/)
+   REAL(dp) :: EOD,time,TargetPrintTime,fracdiffusion,kmcx,kmcd,composition,mincoord(3)
+   REAL(dp) :: boxsize_x=95.0,boxsize_y=95.0,boxsize_z=95.0     !dimensions for AL%BoxSize
+   REAL(dp), DIMENSION(0:12) :: RateDiffusion,RateDissolution,diffncoordination,dislncoordination
+   REAL(dp), DIMENSION(:), POINTER :: VLdrmag=>NULL(),AtomCoord=>NULL(),Rate=>NULL()
+   REAL(dp), DIMENSION(:), POINTER :: Local_composition=>NULL()
+
+   TYPE(SystemContainer), POINTER :: AL=>NULL(),AL1=>NULL()  
+   TYPE(VerletListContainer), POINTER :: VL=>NULL()
+   TYPE(LinkedListContainer), POINTER :: LL=>NULL()
+   TYPE(BinaryTreeLayer), POINTER :: BT=>NULL()
+
+   CHARACTER(len=100) :: filename,tagx,charint2char,crystaltype
+   CHARACTER(len=20), DIMENSION(:), POINTER :: SurfaceInfo=>NULL()
+
+   INTEGER :: NSites,NDissolved,NElectroactive,NElectroactive_initial,NVacancies,Nonactive,CalculationType,NParticle
+   INTEGER :: isite,MaxAtomPerAtom,NAtoms_input,NPrintableAtoms,cntr1,cntr2,cntr3
+   INTEGER :: iter,ikmc,nkmcmove,jmove,p,count,countdiffusion,PrintFreq,NWOrientation
+   INTEGER :: AffectedSiteList(24),NAffectedSites=0,NUpdatedPositions,UpdatedPositions(24*13)
+
+   INTEGER, DIMENSION(:), POINTER :: SpeciesType=>NULL(),Coordination=>NULL(),FirstNearestNeighborSites=>NULL()
+   INTEGER, DIMENSION(:), POINTER :: NeighborSiteList=>NULL(),NumberNeighborSites=>NULL(),ThirdNearestNeighborSites=>NULL()
+   INTEGER, DIMENSION(:), POINTER :: IsSurf111atom=>NULL(),IsSurf100atom=>NULL(),IsSurfOtherAtom=>NULL()
+   INTEGER, DIMENSION(:), POINTER :: IsSubSurf111atom=>NULL(),IsSubSurf100atom=>NULL()
+   INTEGER, DIMENSION(:), POINTER :: VLListRange=>NULL(),VLList=>NULL(),AtomSpecies=>NULL()
+   INTEGER, DIMENSION(:), POINTER :: DiffusionFlux,LigamentIndex=>NULL()
+
+   LOGICAL :: VERBOSE,IsReplaceAtoms,non_lattice
+   LOGICAL, DIMENSION(:), POINTER :: mask=>NULL(),PrintableAtom=>NULL() !can we print the site
+
+   CALL MPI_check 
+   CALL Read_input_parameters
+   CALL Read_input_coordinates  ! Read AL(lattice coordinates) and AL1(particle coordinates)
+   CALL Initialize_variables(AL)
+   CALL LatchParticle(AL1,AL,boxsize_x,boxsize_y,boxsize_z) !from here on, AL is latched particle alongwith the vacant sites
+   CALL Setup_Replaceatoms(AL)
+   CALL Initialize_Species_and_Neighbours
+   CALL Print_info_of_LatchedParticle(AL) !counts NElectroactive, Nonactive, NVacancies
+   CALL Print_LatchedParticle ! file name is latchedslab.xyz
+   CALL Initialize_KMC
+   CALL Count_surface_atoms
+
+   !analyze NW structure from NW-Shell files
+   IF (CalculationType==2) THEN
+       WRITE(6,*) "Analyzing NW frame:",TRIM(filename)
+       CALL AnalyzeNWFrame()
+       STOP
+   END IF
+!stop
+   nkmcmove=10000000
+   VERBOSE=.FALSE.
+   count=0
+   countdiffusion=0
+   TargetPrintTime=0._dp
+ 
+   DO iter=1,50000
+      WRITE(6,*) "Time,iter:",time,iter
+      WRITE(6,*) BT%RateArray(1),SUM(Rate)
+      DO ikmc=1,nkmcmove
+         NAffectedSites=0
+         IF (MOD(ikmc,1000000)==0) CALL BinaryTreeRefresh()
+         CALL BinaryTreeSearch(BT,p)
+         jmove=MOD(p-1,13)+1 !process #
+         isite=(p-jmove)/13+1 !site index
+         IF (jmove<13) THEN !diffusion
+            diffncoordination(coordination(isite))=diffncoordination(coordination(isite))+1.
+         ELSE
+            dislncoordination(coordination(isite))=dislncoordination(coordination(isite))+1.
+         END IF
+         count=count+1
+         IF (jmove<13) countdiffusion=countdiffusion+1
+         IF (VERBOSE) WRITE(6,*) "Selected site:",isite,ikmc
+         IF (VERBOSE) WRITE(6,*) "Move #:",jmove
+         
+         IF(jmove==13) NDissolved=NDissolved+1
+         time=time-LOG(taus88())/BT%RateArray(1)
+         CALL UpdatesAffectedSites(isite,jmove)
+         kmcx=kmcx+1.
+         IF(jmove==13) kmcd=kmcd+1.
+         IF (TargetPrintTime==0.) THEN
+            !TargetPrintTime=10.**(CEILING(LOG10(time)))
+            TargetPrintTime=time*2.0
+            !WRITE(6,*) "Next time for printing:",TargetPrintTime
+         END IF
+         !IF (time>TargetPrintTime .OR. MOD(ikmc,1000000)==0) THEN !18 nm
+         !IF (time>TargetPrintTime .OR. MOD(ikmc,10000)==0) THEN !5 nm
+         IF (count>10) THEN
+            CALL PrintFrame()
+            count=0
+         END IF
+         IF (time>TargetPrintTime .OR. MOD(ikmc,PrintFreq)==0) THEN
+            fracdiffusion=REAL(countdiffusion)/REAL(count)
+            !WRITE(6,*) "Frac diffusion events selected since last reported:",fracdiffusion
+            !WRITE(6,*) "# moves performed since last reported:",count
+            CALL FLUSH(6)
+            countdiffusion=0
+            !IF (count>10) THEN
+            !   CALL PrintFrame()
+            !   count=0
+            !END IF
+            !TargetPrintTime=10.**(CEILING(LOG10(time)))
+            EOD=DBLE(NDissolved)/DBLE(NElectroactive_initial)
+            IF (time>TargetPrintTime) TargetPrintTime=time*2.0
+            !WRITE(6,*) "Next time for printing:",TargetPrintTime
+            WRITE(6,*) "KMC moves:",kmcx,"EOD:",EOD,"time:",time
+         END IF
+      END DO
+   END DO
+
+CONTAINS
+INCLUDE "KMCNanoporous.run.f90"
+INCLUDE "KMCNanoporous.analyze.f90"
+INCLUDE "KMCNanoporous.initialize.f90"
+
+END PROGRAM MAIN
