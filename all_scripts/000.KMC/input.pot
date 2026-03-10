@@ -1,0 +1,288 @@
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   2  26  78
+FePt.set
+1.000
+
+
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   2  47  79
+/home/paramita/pots/AgAu.set
+1.000
+
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   1  79  79
+/home/paramita/pots/Au.set
+1.000
+
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   1  47  47
+/home/paramita/pots/Ag.set
+1.000
+
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   2  47  78
+/home/paramita/pots/AgPt.set                                                
+1.000
+
+
+   3   1  !Number of entries to follow after this line and number of species present
+EAMPPVOTER
+1   1  47  47
+/home/swaticb/abhijit/pots/ag.phit   
+27.210
+EAMDTVOTER
+1   47
+/home/swaticb/abhijit/pots/ag.rhot   
+1.00
+EAMEEVOTER
+1   47
+/home/swaticb/abhijit/pots/ag.ft   
+27.210
+
+
+
+
+
+
+
+   3   1  !Number of entries to follow after this line and number of species present
+EAMPPVOTER
+1   1  29  29
+/home/abhijit/pots/cu.phit   
+27.210
+EAMDTVOTER
+1   29
+/home/abhijit/pots/cu.rhot   
+1.00
+EAMEEVOTER
+1   29
+/home/abhijit/pots/cu.ft   
+27.210
+
+   3   2  !Number of items to follow after this line and the number of species present 
+SW  MULE
+1   1  14  14
+/home/abhijit/workspace/AMD/SiSi.SW.txt
+SW  MULE
+1   2  14  32
+/home/abhijit/workspace/AMD/SiGe.SW.txt
+SW  MULE
+2   2  32  32
+/home/abhijit/workspace/AMD/GeGe.SW.txt
+
+
+
+
+   3   1  !Number of entries to follow after this line and number of species present
+EAMPPVOTER
+1   1  26  26
+/home/abhijit/pots/FeDudarev.phit   
+1.000
+EAMDTVOTER
+1   26
+/home/abhijit/pots/FeDudarev.rhot   
+1.00
+EAMEEVOTER
+1   26
+/home/abhijit/pots/FeDudarev.ft   
+1.000
+
+
+
+
+
+   3   1  !Number of entries to follow after this line and number of species present
+EAMPPVOTER
+1   1  74  74
+/home/abhijit/pots/w3.phit   
+27.210
+EAMDTVOTER
+1   74
+/home/abhijit/pots/w3.rhot   
+1.00
+EAMEEVOTER
+1   74
+/home/abhijit/pots/w3.ft   
+27.210
+
+
+
+
+
+   1   1  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   1  47  47
+/home/abhijit/pots/Ag.set                                                
+1.000
+
+
+   1   2  !Number of entries to follow after this line and number of species present [YSZ]
+COULOMBEW
+2     NSpecies
+1  40
+2  8
+0.41 1.0 7.9208  12   1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+REMEMBER TO CHOOSE THE BUCKINGHAM CONSTANTS CORRECTLY IN COULOMBINITIALIZE.F90
+
+   1   4  !Number of entries to follow after this line and number of species present [LiFePO4]
+COULOMBEW
+4     NSpecies
+1  3
+2  26
+3  15
+4   8
+0.41 1.0 7.9208  12   1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+REMEMBER TO CHOOSE THE BUCKINGHAM CONSTANTS CORRECTLY IN COULOMBINITIALIZE.F90
+
+
+
+   1   3  !Number of entries to follow after this line and number of species present [YSZ]
+COULOMBEW
+3     NSpecies
+1  39
+2  40
+3  8
+0.41 1.0 7.9208  12   1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+REMEMBER TO CHOOSE THE BUCKINGHAM CONSTANTS CORRECTLY IN COULOMBINITIALIZE.F90
+
+
+   1   2  !Number of entries to follow after this line and number of species present [MgO]
+COULOMBEW
+2     NSpecies
+1  12
+2  8
+0.41 1.0 7.9208  12   1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+REMEMBER TO CHOOSE THE BUCKINGHAM CONSTANTS CORRECTLY IN COULOMBINITIALIZE.F90
+
+
+
+   3   2  !Number of entries to follow after this line and number of species present
+BUCK    
+1   2  12  8
+/home/abhijit/Downloads/MgO.Mg-O.buck   
+1.0000
+BUCK     
+2  2   8  8
+/home/abhijit/Downloads/MgO.O-O.buck     
+1.000
+COULOMBEW
+2     NSpecies
+1  12
+2  8
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+0.41 1.0 7.9208 12  1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+
+
+
+
+
+
+
+2     NSpecies
+1  12
+2  8
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+0.41 1.0 7.9208 12  1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+
+
+
+
+
+
+
+   4   3  !Number of entries to follow after this line and number of species present
+BUCK    
+1   3  40  8
+/home/abhijit/Downloads/ZrO.buck   
+1.0000
+BUCK     
+2  3   39  8
+/home/abhijit/Downloads/YO.buck     
+1.000
+BUCK     
+3   3   8   8
+/home/abhijit/Downloads/OO.buck     
+1.000
+COULOMBEW
+3
+1  40
+2  39
+3   8
+0.41 1.0 7.9208 12  1.e-10     Ewald%ALPHA,Ewald%TimeRatio,Ewald%ReCutOff,Ewald%ImCutOff,Ewald%Precision
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+
+
+
+   7   2  !Number of items to follow after this line and number of species present
+EAMDTVOTER
+2   29
+/home/abhijit/pots/cu1.rhot   
+1.00
+EAMEEVOTER
+2   29
+/home/abhijit/pots/cu1.ft   
+27.210
+EAMPPVOTER
+2   2  29  29
+/home/abhijit/pots/cu1.phit   
+27.210
+EAMPPVOTER
+1   2  47  29
+/home/abhijit/pots/cu1ag1.phit   
+27.210
+EAMPPVOTER
+1   1  47  47
+/home/abhijit/pots/ag1.phit   
+27.210
+EAMDTVOTER
+1   47
+/home/abhijit/pots/ag1.rhot   
+1.00
+EAMEEVOTER
+1   47
+/home/abhijit/pots/ag1.ft   
+27.210
+
+
+
+
+   1   2  !Number of items to follow after this line and number of species present
+EAM  SETFL
+1   2  82  29
+/home/abhijit/workspace/Codes/factory/AMD/PbCu.set                                                
+1.000
+
+
+
+
+
+
+   1   2  !Number of entries to follow after this line and number of species present
+COULOMBWOLF
+2        NSpecies
+1   11     Species index and molecular number
+2   17     Species index and molecular number
+5.    Rc
+0.8    alfa
+
+
+
+   1   2  !Number of entries to follow after this line and number of species present
+COULOMBEW
+2     NSpecies
+1  11
+2  17
+-1.00000 -1.00000 -1.00000 -1 -1.00000 
+
+
+
+

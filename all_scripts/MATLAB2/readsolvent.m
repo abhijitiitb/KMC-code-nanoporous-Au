@@ -1,0 +1,1 @@
+%readsolvent.m: read solvent coordinates

@@ -1,0 +1,32 @@
+units		metal
+atom_style	atomic
+boundary        p p p
+neigh_modify    delay 0 every 10 check no
+
+read_data 	2.coordinates
+
+pair_style 	hybrid eam/alloy lj/cut 10.0
+pair_coeff 	* * eam/alloy 0.AgAu.eam.alloy Ag Au NULL
+pair_coeff 	1 3 lj/cut 0.00531 2.95
+pair_coeff 	2 3 lj/cut 0.00531 2.95
+pair_coeff 	3 3 lj/cut 0.00531 2.95
+
+#minimization
+min_style       cg
+minimize        1e-25 1e-25 100000 100000
+reset_timestep	0
+
+# Output thermodynamic data
+thermo          1
+thermo_style    custom step time vol atoms temp pe ke etotal lx press
+
+
+# Generate position coordinates for the production run
+dump            1 all custom 1 dump.lammpstrj id type x y z 
+dump_modify     1 sort id
+
+#  timestep in ps
+timestep        0.001
+
+# Run the simulation for the requisite amount of time
+run 		1

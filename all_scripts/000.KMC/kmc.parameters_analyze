@@ -1,0 +1,13 @@
+"analyze.xyz"
+2               run(1)/analyzeframe(2)
+abc      Temperature
+def      composition
+-0.53           e0
+1.00000000e13   prefac
+0.25000000      xi_binding_energy
+1.00000000e13   pnu_E
+ghi      Overpotential
+jkl            iseed
+".r1"           tag
+1000000         PrintFreq (10000/100000/1000000 is good for 5/9/18 nm)
+1               NWorientation
